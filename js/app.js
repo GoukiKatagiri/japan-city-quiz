@@ -91,7 +91,7 @@ class App {
     });
   }
 
-  async handleAnswer(selectedPref) {
+  handleAnswer(selectedPref) {
     this.ui.disableChoices();
 
     const result = this.game.checkAnswer(selectedPref, this.currentQuestion);
@@ -102,27 +102,68 @@ class App {
     );
     this.ui.updateScore(this.game.getCurrentScore());
 
-    await this.showMap();
-
-    setTimeout(() => {
-      this.cleanupMap();
-      this.nextQuestion();
-    }, 5000);
+    this.setupFeedbackButtons();
   }
 
-  async showMap() {
+  setupFeedbackButtons() {
+    const showMapBtn = document.getElementById('show-map-btn');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+
+    if (showMapBtn) {
+      showMapBtn.onclick = () => this.showMap();
+    }
+
+    if (nextQuestionBtn) {
+      nextQuestionBtn.onclick = () => {
+        this.cleanupMap();
+        this.hideGoogleMapsLink();
+        this.nextQuestion();
+      };
+    }
+  }
+
+  showMap() {
     try {
       if (!this.mapDisplay) {
         this.mapDisplay = new MapDisplay('map-container');
       }
 
-      await this.mapDisplay.showCityBoundary(
+      this.mapDisplay.showCityLocation(
         this.currentQuestion.cityName,
         this.currentQuestion.lat,
-        this.currentQuestion.lng
+        this.currentQuestion.lng,
+        this.currentQuestion.correctAnswer
       );
+
+      this.showGoogleMapsLink();
     } catch (error) {
       console.error('地図表示エラー:', error);
+    }
+  }
+
+  showGoogleMapsLink() {
+    const linkContainer = document.getElementById('google-maps-link');
+    if (linkContainer && this.mapDisplay) {
+      const url = this.mapDisplay.generateGoogleMapsUrl(
+        this.currentQuestion.lat,
+        this.currentQuestion.lng,
+        this.currentQuestion.cityName
+      );
+
+      linkContainer.innerHTML = `
+        <a href="${url}" target="_blank" rel="noopener noreferrer">
+          📍 Google Mapsで開く
+        </a>
+      `;
+      linkContainer.classList.remove('hidden');
+    }
+  }
+
+  hideGoogleMapsLink() {
+    const linkContainer = document.getElementById('google-maps-link');
+    if (linkContainer) {
+      linkContainer.classList.add('hidden');
+      linkContainer.innerHTML = '';
     }
   }
 
@@ -130,6 +171,11 @@ class App {
     if (this.mapDisplay) {
       this.mapDisplay.destroy();
       this.mapDisplay = null;
+    }
+
+    const mapContainer = document.getElementById('map-container');
+    if (mapContainer) {
+      mapContainer.classList.add('hidden');
     }
   }
 
