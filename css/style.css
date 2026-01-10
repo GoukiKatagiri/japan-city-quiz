@@ -335,3 +335,21 @@ body {
   color: var(--text-light);
   margin-bottom: 30px;
 }
+
+/* 地図表示 */
+#map-container {
+  box-shadow: var(--card-shadow);
+}
+
+#map-container .leaflet-container {
+  border-radius: 8px;
+}
+
+.map-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 350px;
+  color: var(--text-light);
+  font-size: 1rem;
+}

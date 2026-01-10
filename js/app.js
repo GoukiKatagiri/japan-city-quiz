@@ -1,6 +1,7 @@
 import { QuizGame } from './game.js';
 import { UIController } from './ui.js';
 import { DataLoader } from './data-loader.js';
+import { MapDisplay } from './map.js';
 
 class App {
   constructor() {
@@ -8,6 +9,7 @@ class App {
     this.ui = null;
     this.dataLoader = new DataLoader();
     this.currentQuestion = null;
+    this.mapDisplay = null;
   }
 
   async init() {
@@ -89,7 +91,7 @@ class App {
     });
   }
 
-  handleAnswer(selectedPref) {
+  async handleAnswer(selectedPref) {
     this.ui.disableChoices();
 
     const result = this.game.checkAnswer(selectedPref, this.currentQuestion);
@@ -100,9 +102,35 @@ class App {
     );
     this.ui.updateScore(this.game.getCurrentScore());
 
+    await this.showMap();
+
     setTimeout(() => {
+      this.cleanupMap();
       this.nextQuestion();
-    }, 2000);
+    }, 5000);
+  }
+
+  async showMap() {
+    try {
+      if (!this.mapDisplay) {
+        this.mapDisplay = new MapDisplay('map-container');
+      }
+
+      await this.mapDisplay.showCityBoundary(
+        this.currentQuestion.cityName,
+        this.currentQuestion.lat,
+        this.currentQuestion.lng
+      );
+    } catch (error) {
+      console.error('地図表示エラー:', error);
+    }
+  }
+
+  cleanupMap() {
+    if (this.mapDisplay) {
+      this.mapDisplay.destroy();
+      this.mapDisplay = null;
+    }
   }
 
   showResults() {
