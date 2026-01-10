@@ -137,29 +137,12 @@ export class UIController {
         btn.classList.add('correct');
       }
     });
-
-    this.showFeedbackButtons();
   }
 
   hideFeedback() {
     const feedback = document.getElementById('feedback');
     if (feedback) {
       feedback.classList.add('hidden');
-    }
-    this.hideFeedbackButtons();
-  }
-
-  showFeedbackButtons() {
-    const feedbackActions = document.querySelector('.feedback-actions');
-    if (feedbackActions) {
-      feedbackActions.classList.remove('hidden');
-    }
-  }
-
-  hideFeedbackButtons() {
-    const feedbackActions = document.querySelector('.feedback-actions');
-    if (feedbackActions) {
-      feedbackActions.classList.add('hidden');
     }
   }
 

@@ -63,7 +63,7 @@ class App {
     this.isAnswered = false;
     this.ui.showGameScreen();
     this.ui.updateScore(0);
-    this.hideButtons();
+    this.hidePostAnswerArea();
     this.nextQuestion();
   }
 
@@ -80,7 +80,7 @@ class App {
 
     // 次の問題の準備
     this.isAnswered = false;
-    this.hideButtons();
+    this.hidePostAnswerArea();
 
     this.currentQuestion = this.game.generateQuestion();
     this.ui.displayQuestion(
@@ -120,8 +120,8 @@ class App {
     );
     this.ui.updateScore(this.game.getCurrentScore());
 
-    // ボタンを表示
-    this.showButtons();
+    // ポストアンサーエリアを表示
+    this.showPostAnswerArea();
     this.setupFeedbackButtons();
   }
 
@@ -142,27 +142,17 @@ class App {
     }
   }
 
-  showButtons() {
-    const showMapBtn = document.getElementById('show-map-btn');
-    const nextQuestionBtn = document.getElementById('next-question-btn');
-
-    if (showMapBtn) {
-      showMapBtn.classList.remove('u-hidden');
-    }
-    if (nextQuestionBtn) {
-      nextQuestionBtn.classList.remove('u-hidden');
+  showPostAnswerArea() {
+    const postAnswerArea = document.getElementById('post-answer-area');
+    if (postAnswerArea) {
+      postAnswerArea.classList.remove('u-hidden');
     }
   }
 
-  hideButtons() {
-    const showMapBtn = document.getElementById('show-map-btn');
-    const nextQuestionBtn = document.getElementById('next-question-btn');
-
-    if (showMapBtn) {
-      showMapBtn.classList.add('u-hidden');
-    }
-    if (nextQuestionBtn) {
-      nextQuestionBtn.classList.add('u-hidden');
+  hidePostAnswerArea() {
+    const postAnswerArea = document.getElementById('post-answer-area');
+    if (postAnswerArea) {
+      postAnswerArea.classList.add('u-hidden');
     }
   }
 
