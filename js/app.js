@@ -61,6 +61,7 @@ class App {
     this.game.reset();
     this.ui.showGameScreen();
     this.ui.updateScore(0);
+    this.ui.hideFeedbackButtons();
     this.nextQuestion();
   }
 
@@ -117,6 +118,7 @@ class App {
       nextQuestionBtn.onclick = () => {
         this.cleanupMap();
         this.hideGoogleMapsLink();
+        this.ui.hideFeedbackButtons();
         this.nextQuestion();
       };
     }
