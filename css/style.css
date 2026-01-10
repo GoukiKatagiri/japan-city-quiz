@@ -18,6 +18,12 @@
   box-sizing: border-box;
 }
 
+/* Utility Classes */
+.u-hidden {
+  display: none !important;
+  pointer-events: none;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
   background-color: var(--bg-color);

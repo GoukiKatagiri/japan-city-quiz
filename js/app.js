@@ -10,6 +10,7 @@ class App {
     this.dataLoader = new DataLoader();
     this.currentQuestion = null;
     this.mapDisplay = null;
+    this.isAnswered = false;
   }
 
   async init() {
@@ -59,17 +60,27 @@ class App {
 
   startGame() {
     this.game.reset();
+    this.isAnswered = false;
     this.ui.showGameScreen();
     this.ui.updateScore(0);
-    this.ui.hideFeedbackButtons();
+    this.hideButtons();
     this.nextQuestion();
   }
 
   nextQuestion() {
+    // Guard clause: 回答していない場合は何もしない
+    if (!this.isAnswered && this.currentQuestion !== null) {
+      return;
+    }
+
     if (!this.game.hasMoreQuestions()) {
       this.showResults();
       return;
     }
+
+    // 次の問題の準備
+    this.isAnswered = false;
+    this.hideButtons();
 
     this.currentQuestion = this.game.generateQuestion();
     this.ui.displayQuestion(
@@ -93,6 +104,12 @@ class App {
   }
 
   handleAnswer(selectedPref) {
+    // Guard clause: すでに回答済みの場合は何もしない（二重回答防止）
+    if (this.isAnswered) {
+      return;
+    }
+
+    this.isAnswered = true;
     this.ui.disableChoices();
 
     const result = this.game.checkAnswer(selectedPref, this.currentQuestion);
@@ -103,6 +120,8 @@ class App {
     );
     this.ui.updateScore(this.game.getCurrentScore());
 
+    // ボタンを表示
+    this.showButtons();
     this.setupFeedbackButtons();
   }
 
@@ -118,9 +137,32 @@ class App {
       nextQuestionBtn.onclick = () => {
         this.cleanupMap();
         this.hideGoogleMapsLink();
-        this.ui.hideFeedbackButtons();
         this.nextQuestion();
       };
+    }
+  }
+
+  showButtons() {
+    const showMapBtn = document.getElementById('show-map-btn');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+
+    if (showMapBtn) {
+      showMapBtn.classList.remove('u-hidden');
+    }
+    if (nextQuestionBtn) {
+      nextQuestionBtn.classList.remove('u-hidden');
+    }
+  }
+
+  hideButtons() {
+    const showMapBtn = document.getElementById('show-map-btn');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+
+    if (showMapBtn) {
+      showMapBtn.classList.add('u-hidden');
+    }
+    if (nextQuestionBtn) {
+      nextQuestionBtn.classList.add('u-hidden');
     }
   }
 
