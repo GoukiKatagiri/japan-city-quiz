@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="日本全国の市区町村を覚えるクイズゲーム">
+  <title>日本全国市区町村クイズ</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ローディング画面 -->
+    <section id="loading-screen" class="screen">
+      <div class="loader"></div>
+      <p>データを読み込んでいます...</p>
+    </section>
+
+    <!-- スタート画面 -->
+    <section id="start-screen" class="screen hidden">
+      <h1 class="title">日本全国市区町村クイズ</h1>
+      <p class="description">表示された市区町村がどの都道府県か当てよう!</p>
+      <button id="start-btn" class="btn-primary">スタート</button>
+      <div class="stats">
+        <p>ハイスコア: <span id="high-score">0</span></p>
+      </div>
+    </section>
+
+    <!-- ゲーム画面 -->
+    <section id="game-screen" class="screen hidden">
+      <div class="game-header">
+        <div class="score-display">
+          <span class="label">スコア</span>
+          <span id="current-score" class="value">0</span>
+        </div>
+        <div class="progress-display">
+          <span class="label">問題</span>
+          <span id="question-num" class="value">1</span>/10
+        </div>
+      </div>
+
+      <div class="question-container">
+        <h2 id="city-name" class="city-name"></h2>
+        <p id="city-kana" class="city-kana"></p>
+        <p class="question-text">この市区町村はどの都道府県?</p>
+      </div>
+
+      <div id="choices" class="choices-grid">
+        <!-- JavaScriptで動的生成 -->
+      </div>
+
+      <div id="feedback" class="feedback hidden">
+        <div class="feedback-text"></div>
+      </div>
+    </section>
+
+    <!-- 結果画面 -->
+    <section id="result-screen" class="screen hidden">
+      <h2 class="result-title">ゲーム終了!</h2>
+      <div class="result-stats">
+        <div class="stat-item">
+          <span class="stat-label">総スコア</span>
+          <span id="final-score" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">正解率</span>
+          <span id="accuracy" class="stat-value">0%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">正解数</span>
+          <span id="correct-count" class="stat-value">0/10</span>
+        </div>
+      </div>
+      <div id="new-record" class="new-record hidden">
+        新記録達成!
+      </div>
+      <div class="result-actions">
+        <button id="retry-btn" class="btn-primary">もう一度</button>
+        <button id="home-btn" class="btn-secondary">トップへ</button>
+      </div>
+    </section>
+
+    <!-- エラー画面 -->
+    <section id="error-screen" class="screen hidden">
+      <h2 class="error-title">エラー</h2>
+      <p id="error-message">データの読み込みに失敗しました</p>
+      <button id="reload-btn" class="btn-primary">再読み込み</button>
+    </section>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

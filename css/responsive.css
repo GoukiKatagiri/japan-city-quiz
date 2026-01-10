@@ -1,0 +1,171 @@
+/* タブレット (768px以下) */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .city-name {
+    font-size: 2rem;
+  }
+
+  .city-kana {
+    font-size: 1.1rem;
+  }
+
+  .question-text {
+    font-size: 1rem;
+  }
+
+  .game-header {
+    padding: 15px;
+  }
+
+  .value {
+    font-size: 1.5rem;
+  }
+
+  .choices-grid {
+    gap: 12px;
+  }
+
+  .choice-btn {
+    padding: 18px;
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* スマートフォン (480px以下) */
+@media (max-width: 480px) {
+  #app {
+    padding: 10px;
+  }
+
+  .screen {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .city-name {
+    font-size: 1.6rem;
+  }
+
+  .city-kana {
+    font-size: 1rem;
+  }
+
+  .question-text {
+    font-size: 0.95rem;
+  }
+
+  .game-header {
+    flex-direction: row;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .label {
+    font-size: 0.8rem;
+  }
+
+  .value {
+    font-size: 1.3rem;
+  }
+
+  .choices-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .choice-btn {
+    padding: 15px;
+    font-size: 1rem;
+    min-height: 60px;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+
+  .result-title {
+    font-size: 2rem;
+  }
+
+  .result-stats {
+    padding: 20px;
+  }
+
+  .stat-item {
+    padding: 12px 0;
+  }
+
+  .stat-label {
+    font-size: 0.95rem;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+  }
+
+  .feedback {
+    padding: 15px;
+    font-size: 1.1rem;
+  }
+
+  .correct-text, .wrong-text {
+    font-size: 1.3rem;
+  }
+
+  .correct-answer {
+    font-size: 1rem;
+  }
+
+  .new-record {
+    font-size: 1.3rem;
+  }
+
+  .result-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .result-actions button {
+    width: 100%;
+  }
+}
+
+/* 非常に小さいデバイス (360px以下) */
+@media (max-width: 360px) {
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .city-name {
+    font-size: 1.4rem;
+  }
+
+  .city-kana {
+    font-size: 0.9rem;
+  }
+
+  .choice-btn {
+    padding: 12px;
+    font-size: 0.95rem;
+    min-height: 55px;
+  }
+}
