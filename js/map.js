@@ -45,7 +45,7 @@ export class MapDisplay {
 
   generateGoogleMapsUrl(lat, lng, cityName) {
     const query = encodeURIComponent(cityName);
-    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    return `https://www.google.com/maps/search/?api=1&query=${query}`;
   }
 
   destroy() {
