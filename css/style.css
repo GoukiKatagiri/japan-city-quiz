@@ -373,22 +373,43 @@ body {
   font-size: 1rem;
 }
 
-/* Google Mapsリンク */
-.google-maps-link {
-  margin-top: 15px;
-  text-align: center;
-  font-size: 1rem;
+/* --- UI/UX Improvements (Layout Shift Prevention) --- */
+
+#feedback {
+  /* コンテンツの有無に関わらず、エリアの高さを確保する */
+  min-height: 250px;
+  /* 透明度の変化をアニメーションさせる */
+  transition: opacity 0.3s ease-in-out;
 }
 
-.google-maps-link a {
-  color: var(--primary-color);
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+/* 既存の .hidden クラスの display: none を上書きし、透明度で制御する */
+#feedback.hidden {
+  display: block !important; /* displayプロパティを上書き */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
-.google-maps-link a:hover {
-  text-decoration: underline;
+#post-answer-area {
+  transition: opacity 0.3s ease-in-out 0.1s; /* 少し遅れて表示 */
+}
+
+/* 既存の .u-hidden クラスの display: none を上書き */
+#post-answer-area.u-hidden {
+  display: block !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#map-container {
+  transition: opacity 0.4s ease-in-out;
+}
+
+/* 地図コンテナも同様に display: none を上書き */
+#map-container.hidden {
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }

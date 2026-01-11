@@ -1,162 +1,173 @@
 export class UIController {
   constructor() {
-    this.screens = {
-      loading: document.getElementById('loading-screen'),
-      start: document.getElementById('start-screen'),
-      game: document.getElementById('game-screen'),
-      result: document.getElementById('result-screen'),
-      error: document.getElementById('error-screen')
+    this.elements = {
+      // Screens
+      loadingScreen: document.getElementById('loading-screen'),
+      startScreen: document.getElementById('start-screen'),
+      gameScreen: document.getElementById('game-screen'),
+      resultScreen: document.getElementById('result-screen'),
+      errorScreen: document.getElementById('error-screen'),
+
+      // Start Screen
+      highScore: document.getElementById('high-score'),
+
+      // Game Screen
+      currentScore: document.getElementById('current-score'),
+      questionNum: document.getElementById('question-num'),
+      cityName: document.getElementById('city-name'),
+      cityKana: document.getElementById('city-kana'),
+      choices: document.getElementById('choices'),
+      feedback: document.getElementById('feedback'),
+      postAnswerArea: document.getElementById('post-answer-area'),
+      feedbackTextContainer: document.querySelector('#feedback .feedback-text'),
+      feedbackResultText: document.getElementById('feedback-result-text'),
+      feedbackPointsText: document.getElementById('feedback-points-text'),
+      feedbackCorrectAnswerText: document.getElementById('feedback-correct-answer-text'),
+      mapContainer: document.getElementById('map-container'),
+      googleMapsLink: document.getElementById('google-maps-link'),
+
+      // Result Screen
+      finalScore: document.getElementById('final-score'),
+      accuracy: document.getElementById('accuracy'),
+      correctCount: document.getElementById('correct-count'),
+      newRecord: document.getElementById('new-record'),
+
+      // Error Screen
+      errorMessage: document.getElementById('error-message'),
     };
+
+    this.screens = [
+      this.elements.loadingScreen,
+      this.elements.startScreen,
+      this.elements.gameScreen,
+      this.elements.resultScreen,
+      this.elements.errorScreen,
+    ];
   }
 
+  // --- State-based UI Update ---
+  updateView(phase) {
+    const isQuestionPhase = phase === 'question';
+    this.elements.postAnswerArea?.classList.toggle('u-hidden', isQuestionPhase);
+
+    if (isQuestionPhase) {
+      this.elements.mapContainer?.classList.add('hidden');
+      this.elements.googleMapsLink?.classList.add('hidden');
+    }
+  }
+
+  // --- Screen Management ---
   hideAllScreens() {
-    Object.values(this.screens).forEach(screen => {
+    this.screens.forEach(screen => {
       if (screen) screen.classList.add('hidden');
     });
   }
 
-  showLoading() {
+  showScreen(screenName, data = {}) {
     this.hideAllScreens();
-    if (this.screens.loading) {
-      this.screens.loading.classList.remove('hidden');
-    }
-  }
-
-  hideLoading() {
-    if (this.screens.loading) {
-      this.screens.loading.classList.add('hidden');
-    }
-  }
-
-  showStartScreen(highScore = 0) {
-    this.hideAllScreens();
-    if (this.screens.start) {
-      this.screens.start.classList.remove('hidden');
-      const highScoreElement = document.getElementById('high-score');
-      if (highScoreElement) {
-        highScoreElement.textContent = highScore.toLocaleString();
-      }
-    }
-  }
-
-  showGameScreen() {
-    this.hideAllScreens();
-    if (this.screens.game) {
-      this.screens.game.classList.remove('hidden');
-    }
-  }
-
-  showResultScreen(results) {
-    this.hideAllScreens();
-    if (this.screens.result) {
-      this.screens.result.classList.remove('hidden');
-
-      const finalScore = document.getElementById('final-score');
-      const accuracy = document.getElementById('accuracy');
-      const correctCount = document.getElementById('correct-count');
-      const newRecord = document.getElementById('new-record');
-
-      if (finalScore) finalScore.textContent = results.score.toLocaleString();
-      if (accuracy) accuracy.textContent = `${results.accuracy}%`;
-      if (correctCount) {
-        correctCount.textContent = `${results.correctCount}/${results.totalQuestions}`;
-      }
-
-      if (newRecord) {
-        if (results.isNewRecord) {
-          newRecord.classList.remove('hidden');
-        } else {
-          newRecord.classList.add('hidden');
+    switch (screenName) {
+      case 'loading':
+        this.elements.loadingScreen?.classList.remove('hidden');
+        break;
+      case 'start':
+        this.elements.startScreen?.classList.remove('hidden');
+        if (this.elements.highScore) {
+          this.elements.highScore.textContent = (data.highScore || 0).toLocaleString();
         }
-      }
+        break;
+      case 'game':
+        this.elements.gameScreen?.classList.remove('hidden');
+        break;
+      case 'result':
+        this.elements.resultScreen?.classList.remove('hidden');
+        this.renderResults(data.results);
+        break;
+      case 'error':
+        this.elements.errorScreen?.classList.remove('hidden');
+        if (this.elements.errorMessage) {
+          this.elements.errorMessage.textContent = data.message || '不明なエラーが発生しました';
+        }
+        break;
     }
   }
 
-  showError(message) {
-    this.hideAllScreens();
-    if (this.screens.error) {
-      this.screens.error.classList.remove('hidden');
-      const errorMessage = document.getElementById('error-message');
-      if (errorMessage) {
-        errorMessage.textContent = message;
-      }
+  renderResults(results) {
+    if (!results) return;
+    if (this.elements.finalScore) this.elements.finalScore.textContent = results.score.toLocaleString();
+    if (this.elements.accuracy) this.elements.accuracy.textContent = `${results.accuracy}%`;
+    if (this.elements.correctCount) {
+      this.elements.correctCount.textContent = `${results.correctCount}/${results.totalQuestions}`;
     }
+    this.elements.newRecord?.classList.toggle('hidden', !results.isNewRecord);
   }
 
-  displayQuestion(question, questionNumber, totalQuestions) {
-    const cityName = document.getElementById('city-name');
-    const cityKana = document.getElementById('city-kana');
-    const choicesContainer = document.getElementById('choices');
-    const questionNum = document.getElementById('question-num');
 
-    if (cityName) cityName.textContent = question.cityName;
-    if (cityKana) cityKana.textContent = `(${question.cityKana})`;
-    if (questionNum) questionNum.textContent = questionNumber;
+  // --- Game Component Rendering ---
+  displayQuestion(question, questionNumber) {
+    if (this.elements.cityName) this.elements.cityName.textContent = question.cityName;
+    if (this.elements.cityKana) this.elements.cityKana.textContent = `(${question.cityKana})`;
+    if (this.elements.questionNum) this.elements.questionNum.textContent = questionNumber;
 
-    if (choicesContainer) {
-      choicesContainer.innerHTML = '';
+    if (this.elements.choices) {
+      this.elements.choices.innerHTML = '';
       question.choices.forEach(choice => {
         const button = document.createElement('button');
         button.className = 'choice-btn';
         button.textContent = choice;
         button.dataset.prefecture = choice;
-        choicesContainer.appendChild(button);
+        this.elements.choices.appendChild(button);
       });
     }
 
     this.hideFeedback();
+    this.updateView('question');
   }
 
   updateScore(score) {
-    const currentScore = document.getElementById('current-score');
-    if (currentScore) {
-      currentScore.textContent = score.toLocaleString();
+    if (this.elements.currentScore) {
+      this.elements.currentScore.textContent = score.toLocaleString();
     }
   }
 
   showFeedback(isCorrect, correctAnswer, pointsEarned = 0) {
-    const feedback = document.getElementById('feedback');
-    const feedbackText = feedback.querySelector('.feedback-text');
+    const { feedback, feedbackResultText, feedbackPointsText, feedbackCorrectAnswerText } = this.elements;
 
-    if (feedback && feedbackText) {
+    if (feedback && feedbackResultText && feedbackPointsText && feedbackCorrectAnswerText) {
       if (isCorrect) {
-        feedbackText.innerHTML = `<div class="correct-text">正解！ +${pointsEarned}点</div>`;
         feedback.className = 'feedback correct';
+        feedbackResultText.textContent = '正解！';
+        feedbackPointsText.textContent = `+${pointsEarned}点`;
+        feedbackCorrectAnswerText.textContent = '';
       } else {
-        feedbackText.innerHTML = `<div class="wrong-text">不正解</div><div class="correct-answer">正解: ${correctAnswer}</div>`;
         feedback.className = 'feedback wrong';
+        feedbackResultText.textContent = '不正解';
+        feedbackPointsText.textContent = '';
+        feedbackCorrectAnswerText.textContent = `正解: ${correctAnswer}`;
       }
-
       feedback.classList.remove('hidden');
     }
 
-    const choiceBtns = document.querySelectorAll('.choice-btn');
+    const choiceBtns = this.elements.choices.querySelectorAll('.choice-btn');
     choiceBtns.forEach(btn => {
       btn.disabled = true;
       if (btn.dataset.prefecture === correctAnswer) {
         btn.classList.add('correct');
       }
     });
+
+    this.updateView('feedback');
   }
 
   hideFeedback() {
-    const feedback = document.getElementById('feedback');
-    if (feedback) {
-      feedback.classList.add('hidden');
+    if (this.elements.feedback) {
+      this.elements.feedback.classList.add('hidden');
     }
   }
 
   disableChoices() {
-    const choiceBtns = document.querySelectorAll('.choice-btn');
+    const choiceBtns = this.elements.choices.querySelectorAll('.choice-btn');
     choiceBtns.forEach(btn => {
       btn.disabled = true;
-    });
-  }
-
-  enableChoices() {
-    const choiceBtns = document.querySelectorAll('.choice-btn');
-    choiceBtns.forEach(btn => {
-      btn.disabled = false;
     });
   }
 }

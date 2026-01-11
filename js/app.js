@@ -6,69 +6,58 @@ import { MapDisplay } from './map.js';
 class App {
   constructor() {
     this.game = null;
-    this.ui = null;
+    this.ui = new UIController();
     this.dataLoader = new DataLoader();
     this.currentQuestion = null;
     this.mapDisplay = null;
     this.isAnswered = false;
+
+    this.elements = {
+      startBtn: document.getElementById('start-btn'),
+      retryBtn: document.getElementById('retry-btn'),
+      homeBtn: document.getElementById('home-btn'),
+      reloadBtn: document.getElementById('reload-btn'),
+      showMapBtn: document.getElementById('show-map-btn'),
+      nextQuestionBtn: document.getElementById('next-question-btn'),
+    };
   }
 
   async init() {
     try {
-      this.ui = new UIController();
-      this.ui.showLoading();
+      this.ui.showScreen('loading');
 
       const data = await this.dataLoader.loadData();
       this.game = new QuizGame(data.cities, data.prefectures);
 
-      this.ui.hideLoading();
       this.setupEventListeners();
-      this.ui.showStartScreen(this.game.getHighScore());
+      this.ui.showScreen('start', { highScore: this.game.getHighScore() });
 
     } catch (error) {
       console.error('初期化エラー:', error);
-      this.ui.showError('データの読み込みに失敗しました');
+      this.ui.showScreen('error', { message: 'データの読み込みに失敗しました' });
     }
   }
 
   setupEventListeners() {
-    const startBtn = document.getElementById('start-btn');
-    const retryBtn = document.getElementById('retry-btn');
-    const homeBtn = document.getElementById('home-btn');
-    const reloadBtn = document.getElementById('reload-btn');
-
-    if (startBtn) {
-      startBtn.addEventListener('click', () => this.startGame());
-    }
-
-    if (retryBtn) {
-      retryBtn.addEventListener('click', () => this.startGame());
-    }
-
-    if (homeBtn) {
-      homeBtn.addEventListener('click', () => {
-        this.ui.showStartScreen(this.game.getHighScore());
-      });
-    }
-
-    if (reloadBtn) {
-      reloadBtn.addEventListener('click', () => {
-        window.location.reload();
-      });
-    }
+    this.elements.startBtn?.addEventListener('click', () => this.startGame());
+    this.elements.retryBtn?.addEventListener('click', () => this.startGame());
+    this.elements.homeBtn?.addEventListener('click', () => {
+      this.ui.showScreen('start', { highScore: this.game.getHighScore() });
+    });
+    this.elements.reloadBtn?.addEventListener('click', () => {
+      window.location.reload();
+    });
   }
 
   startGame() {
     this.game.reset();
     this.isAnswered = false;
-    this.ui.showGameScreen();
+    this.ui.showScreen('game');
     this.ui.updateScore(0);
-    this.hidePostAnswerArea();
     this.nextQuestion();
   }
 
   nextQuestion() {
-    // Guard clause: 回答していない場合は何もしない
     if (!this.isAnswered && this.currentQuestion !== null) {
       return;
     }
@@ -78,15 +67,13 @@ class App {
       return;
     }
 
-    // 次の問題の準備
     this.isAnswered = false;
-    this.hidePostAnswerArea();
+    this.cleanupMap(); // Mapインスタンスの破棄はAppの責務
 
     this.currentQuestion = this.game.generateQuestion();
     this.ui.displayQuestion(
       this.currentQuestion,
-      this.game.getCurrentQuestionNumber(),
-      this.game.totalQuestions
+      this.game.getCurrentQuestionNumber()
     );
     this.ui.updateScore(this.game.getCurrentScore());
 
@@ -94,8 +81,7 @@ class App {
   }
 
   setupChoiceListeners() {
-    const choiceBtns = document.querySelectorAll('.choice-btn');
-
+    const choiceBtns = this.ui.elements.choices.querySelectorAll('.choice-btn');
     choiceBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         this.handleAnswer(e.target.dataset.prefecture);
@@ -104,13 +90,10 @@ class App {
   }
 
   handleAnswer(selectedPref) {
-    // Guard clause: すでに回答済みの場合は何もしない（二重回答防止）
     if (this.isAnswered) {
       return;
     }
-
     this.isAnswered = true;
-    this.ui.disableChoices();
 
     const result = this.game.checkAnswer(selectedPref, this.currentQuestion);
     this.ui.showFeedback(
@@ -120,48 +103,21 @@ class App {
     );
     this.ui.updateScore(this.game.getCurrentScore());
 
-    // ポストアンサーエリアを表示
-    this.showPostAnswerArea();
     this.setupFeedbackButtons();
   }
 
   setupFeedbackButtons() {
-    const showMapBtn = document.getElementById('show-map-btn');
-    const nextQuestionBtn = document.getElementById('next-question-btn');
-
-    if (showMapBtn) {
-      showMapBtn.onclick = () => this.showMap();
-    }
-
-    if (nextQuestionBtn) {
-      nextQuestionBtn.onclick = () => {
-        this.cleanupMap();
-        this.hideGoogleMapsLink();
-        this.nextQuestion();
-      };
-    }
-  }
-
-  showPostAnswerArea() {
-    const postAnswerArea = document.getElementById('post-answer-area');
-    if (postAnswerArea) {
-      postAnswerArea.classList.remove('u-hidden');
-    }
-  }
-
-  hidePostAnswerArea() {
-    const postAnswerArea = document.getElementById('post-answer-area');
-    if (postAnswerArea) {
-      postAnswerArea.classList.add('u-hidden');
-    }
+    this.elements.showMapBtn.onclick = () => this.showMap();
+    this.elements.nextQuestionBtn.onclick = () => this.nextQuestion();
   }
 
   showMap() {
     try {
       if (!this.mapDisplay) {
-        this.mapDisplay = new MapDisplay('map-container');
+        this.mapDisplay = new MapDisplay(this.ui.elements.mapContainer.id);
       }
 
+      this.ui.elements.mapContainer?.classList.remove('hidden');
       this.mapDisplay.showCityLocation(
         this.currentQuestion.cityName,
         this.currentQuestion.lat,
@@ -176,28 +132,20 @@ class App {
   }
 
   showGoogleMapsLink() {
-    const linkContainer = document.getElementById('google-maps-link');
-    if (linkContainer && this.mapDisplay) {
+    const { googleMapsLink } = this.ui.elements;
+    if (googleMapsLink && this.mapDisplay) {
       const url = this.mapDisplay.generateGoogleMapsUrl(
         this.currentQuestion.lat,
         this.currentQuestion.lng,
         this.currentQuestion.cityName
       );
 
-      linkContainer.innerHTML = `
+      googleMapsLink.innerHTML = `
         <a href="${url}" target="_blank" rel="noopener noreferrer">
           📍 Google Mapsで開く
         </a>
       `;
-      linkContainer.classList.remove('hidden');
-    }
-  }
-
-  hideGoogleMapsLink() {
-    const linkContainer = document.getElementById('google-maps-link');
-    if (linkContainer) {
-      linkContainer.classList.add('hidden');
-      linkContainer.innerHTML = '';
+      googleMapsLink.classList.remove('hidden');
     }
   }
 
@@ -206,16 +154,12 @@ class App {
       this.mapDisplay.destroy();
       this.mapDisplay = null;
     }
-
-    const mapContainer = document.getElementById('map-container');
-    if (mapContainer) {
-      mapContainer.classList.add('hidden');
-    }
+    // DOM操作はui.jsに任せる (updateViewがやってくれる)
   }
 
   showResults() {
     const results = this.game.getResults();
-    this.ui.showResultScreen(results);
+    this.ui.showScreen('result', { results });
   }
 }
 
