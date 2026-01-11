@@ -9,7 +9,7 @@ class App {
     this.ui = new UIController();
     this.dataLoader = new DataLoader();
     this.currentQuestion = null;
-    this.mapDisplay = null;
+    this.mapDisplay = null; // 地図インスタンスを保持
     this.isAnswered = false;
 
     this.elements = {
@@ -17,7 +17,6 @@ class App {
       retryBtn: document.getElementById('retry-btn'),
       homeBtn: document.getElementById('home-btn'),
       reloadBtn: document.getElementById('reload-btn'),
-      showMapBtn: document.getElementById('show-map-btn'),
       nextQuestionBtn: document.getElementById('next-question-btn'),
     };
   }
@@ -68,7 +67,8 @@ class App {
     }
 
     this.isAnswered = false;
-    this.cleanupMap(); // Mapインスタンスの破棄はAppの責務
+    // cleanupMapは不要。インスタンスを破棄しないため。
+    // UIの非表示はui.jsが担当する。
 
     this.currentQuestion = this.game.generateQuestion();
     this.ui.displayQuestion(
@@ -103,21 +103,24 @@ class App {
     );
     this.ui.updateScore(this.game.getCurrentScore());
 
-    this.setupFeedbackButtons();
+    this.showMap();
+    this.setupNextQuestionButton();
   }
 
-  setupFeedbackButtons() {
-    this.elements.showMapBtn.onclick = () => this.showMap();
+  setupNextQuestionButton() {
     this.elements.nextQuestionBtn.onclick = () => this.nextQuestion();
   }
 
   showMap() {
     try {
+      // 初回のみ地図インスタンスを生成
       if (!this.mapDisplay) {
         this.mapDisplay = new MapDisplay(this.ui.elements.mapContainer.id);
       }
 
       this.ui.elements.mapContainer?.classList.remove('hidden');
+
+      // 常にshowCityLocationを呼び出して地図を更新
       this.mapDisplay.showCityLocation(
         this.currentQuestion.cityName,
         this.currentQuestion.lat,
@@ -147,14 +150,6 @@ class App {
       `;
       googleMapsLink.classList.remove('hidden');
     }
-  }
-
-  cleanupMap() {
-    if (this.mapDisplay) {
-      this.mapDisplay.destroy();
-      this.mapDisplay = null;
-    }
-    // DOM操作はui.jsに任せる (updateViewがやってくれる)
   }
 
   showResults() {

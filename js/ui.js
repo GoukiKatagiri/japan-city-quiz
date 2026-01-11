@@ -47,12 +47,14 @@ export class UIController {
 
   // --- State-based UI Update ---
   updateView(phase) {
-    const isQuestionPhase = phase === 'question';
-    this.elements.postAnswerArea?.classList.toggle('u-hidden', isQuestionPhase);
-
-    if (isQuestionPhase) {
+    if (phase === 'question') {
+      // 問題表示時は、解答エリアを非表示（フェードアウト）
+      this.elements.postAnswerArea?.classList.remove('is-visible');
       this.elements.mapContainer?.classList.add('hidden');
       this.elements.googleMapsLink?.classList.add('hidden');
+    } else if (phase === 'feedback') {
+      // 解答表示時は、解答エリアを表示（フェードイン）
+      this.elements.postAnswerArea?.classList.add('is-visible');
     }
   }
 

@@ -373,43 +373,80 @@ body {
   font-size: 1rem;
 }
 
-/* --- UI/UX Improvements (Layout Shift Prevention) --- */
+/* --- UI/UX Improvements (Zero Layout Shift) --- */
 
 #feedback {
-  /* コンテンツの有無に関わらず、エリアの高さを確保する */
-  min-height: 250px;
-  /* 透明度の変化をアニメーションさせる */
+  /* フィードバック自体の表示/非表示は継続して利用 */
   transition: opacity 0.3s ease-in-out;
 }
 
-/* 既存の .hidden クラスの display: none を上書きし、透明度で制御する */
 #feedback.hidden {
-  display: block !important; /* displayプロパティを上書き */
+  display: block !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
 
+/* 解答後のエリア全体をコンテナ化し、高さを確保 */
 #post-answer-area {
-  transition: opacity 0.3s ease-in-out 0.1s; /* 少し遅れて表示 */
+  min-height: 420px; /* フィードバックテキスト + ボタン + 地図の合計高さを確保 */
+  transition: opacity 0.4s ease-in-out, transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
 }
 
-/* 既存の .u-hidden クラスの display: none を上書き */
-#post-answer-area.u-hidden {
-  display: block !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+/* 表示状態を制御するクラス */
+#post-answer-area.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 #map-container {
+  width: 100%;
+  height: 350px;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f0f2f5; /* スケルトンUI用の背景色 */
   transition: opacity 0.4s ease-in-out;
 }
 
-/* 地図コンテナも同様に display: none を上書き */
+/* 地図の読み込み中は非表示 */
 #map-container.hidden {
   display: block !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+/* Google Mapsリンク */
+.google-maps-link {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.google-maps-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.google-maps-link a:hover {
+  text-decoration: underline;
+}
+
+/* --- Responsive Design for smaller screens --- */
+@media (max-width: 600px) {
+  #post-answer-area {
+    min-height: 380px; /* モバイルでは少し高さを詰める */
+  }
+  #map-container {
+    height: 300px; /* モバイルでは地図の高さを調整 */
+  }
 }
